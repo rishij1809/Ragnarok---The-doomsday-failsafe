@@ -1,0 +1,32 @@
+{
+  "name": "ragnarok",
+  "version": "1.0.0",
+  "description": "Ragnarok - Multi-Cloud Disaster Recovery (DR) System with Zero-Downtime Failover Across Cloud Regions",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "npx jest --detectOpenHandles --forceExit"
+  },
+  "keywords": [
+    "disaster-recovery",
+    "multi-cloud",
+    "aws",
+    "azure",
+    "failover",
+    "rto",
+    "rpo",
+    "high-availability"
+  ],
+  "author": "Ragnarok SRE & DevOps Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
