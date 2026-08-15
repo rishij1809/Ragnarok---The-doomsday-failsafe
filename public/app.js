@@ -291,8 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnAbortFailover.addEventListener('click', () => {
-    sendApiPost('/api/v1/failover/abort', { reason: 'Operator Manual Abort' });
+  btnAbortFailover.addEventListener('click', async () => {
+    if (confirm('Are you sure you want to abort the failover and restore primary region active status?')) {
+      const res = await sendApiPost('/api/v1/failover/abort', { reason: 'Operator Manual Abort' });
+      if (res && res.status === 'success') {
+        alert('Failover aborted! Primary region restored as active.');
+      }
+    }
   });
 
   btnExecuteFailback.addEventListener('click', () => {

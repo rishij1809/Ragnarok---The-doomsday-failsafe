@@ -150,27 +150,30 @@ class FailoverOrchestrator {
   }
 
   /**
-   * Manually Abort Failover (FR-11)
+   * Manually Abort Failover / Reset to Primary (FR-11)
    */
   abortFailover(userRole = 'SRE_OPERATOR', reason = 'Operator Abort Command') {
     if (userRole !== 'SRE_OPERATOR' && userRole !== 'ADMIN') {
       throw new Error('Unauthorized: Elevated DR_OPERATOR role required to abort failover.');
     }
 
-    if (this.currentState === 'HEALTHY' || this.currentState === 'FAILED_OVER') {
-      return { success: false, message: 'No active failover workflow to abort.' };
-    }
+    // 1. Restore Primary Region Health & Reset Lag
+    healthMonitor.restoreHealth('primary');
+    replicationManager.resetSimulatedLag();
 
-    this.transitionTo('HEALTHY', `[MANUAL ABORT by ${userRole}] ${reason}`);
-    if (this.currentEvent) {
+    // 2. Demote Secondary Database & Reset Capacity & Traffic Routing
+    replicationManager.demoteSecondaryDatabase();
+    config.regions.secondary.capacity = 20;
+    this.activeTrafficRegion = config.regions.primary.id;
+
+    // 3. Mark current event aborted if active
+    if (this.currentEvent && this.currentEvent.status === 'IN_PROGRESS') {
       this.currentEvent.status = 'ABORTED';
       this.currentEvent.end_time = new Date().toISOString();
     }
 
-    // Reset compute capacity & DB role
-    replicationManager.demoteSecondaryDatabase();
-    config.regions.secondary.capacity = 20;
-    this.activeTrafficRegion = config.regions.primary.id;
+    // 4. Transition State Machine back to HEALTHY
+    this.transitionTo('HEALTHY', `[MANUAL ABORT by ${userRole}] ${reason}`);
 
     return { success: true, message: 'Failover aborted successfully. Primary restored as active region.' };
   }
