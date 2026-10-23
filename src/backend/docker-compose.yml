@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # AWS Primary DB Simulation
+  aws-db-primary:
+    image: postgres:16-alpine
+    container_name: ragnarock-aws-postgres
+    environment:
+      POSTGRES_DB: ragnarock_db
+      POSTGRES_USER: ragnarock_admin
+      POSTGRES_PASSWORD: ragnarock_secure_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - aws_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ragnarock_admin -d ragnarock_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Azure Secondary Standby DB Simulation
+  azure-db-secondary:
+    image: postgres:16-alpine
+    container_name: ragnarock-azure-postgres
+    environment:
+      POSTGRES_DB: ragnarock_db
+      POSTGRES_USER: ragnarock_admin
+      POSTGRES_PASSWORD: ragnarock_secure_pass_2026
+    ports:
+      - "5433:5432"
+    volumes:
+      - azure_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ragnarock_admin -d ragnarock_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Benchmark Django Workload
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ragnarock-django-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_DEBUG=True
+      - AWS_DB_HOST=aws-db-primary
+      - AWS_DB_PORT=5432
+      - AZURE_DB_HOST=azure-db-secondary
+      - AZURE_DB_PORT=5432
+      - CLOUD_PROVIDER=AWS
+      - CLOUD_REGION=us-east-1
+      - NODE_ID=local-bench-01
+      - DR_FAILOVER_ACTIVE=false
+    depends_on:
+      aws-db-primary:
+        condition: service_healthy
+      azure-db-secondary:
+        condition: service_healthy
+
+volumes:
+  aws_pgdata:
+  azure_pgdata:

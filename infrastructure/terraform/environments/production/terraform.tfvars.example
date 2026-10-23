@@ -1,0 +1,26 @@
+# Project Ragnarock - Production Environment Variables Example
+# Copy this file to terraform.tfvars and fill in production secrets
+
+environment = "production"
+
+# AWS Config
+aws_region              = "us-east-1"
+aws_vpc_cidr            = "10.100.0.0/16"
+aws_public_subnet_cidrs = ["10.100.1.0/24", "10.100.2.0/24"]
+aws_app_subnet_cidrs    = ["10.100.10.0/24", "10.100.20.0/24"]
+aws_db_subnet_cidrs     = ["10.100.30.0/24", "10.100.40.0/24"]
+
+# Azure Config
+azure_location             = "eastus"
+azure_vnet_cidr           = "10.200.0.0/16"
+azure_gateway_subnet_cidr = "10.200.255.0/27"
+azure_public_subnet_cidr  = "10.200.1.0/24"
+azure_app_subnet_cidr     = "10.200.10.0/24"
+azure_db_subnet_cidr      = "10.200.20.0/24"
+
+# Secrets (Change in Production)
+django_secret_key_aws    = "CHANGE-ME-PRODUCTION-AWS-DJANGO-KEY-2026-PRIMARY"
+django_secret_key_azure  = "CHANGE-ME-PRODUCTION-AZURE-DJANGO-KEY-2026-SECONDARY"
+postgres_user            = "ragnarock_admin"
+postgres_password        = "P@ssw0rd2026!RagnarockSecure"
+db_name                  = "ragnarock_db"

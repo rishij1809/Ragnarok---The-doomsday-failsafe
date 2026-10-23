@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-09-30 16:39:17Z",
+  "target_rps": 50,
+  "total_transactions_sent": 275,
+  "aws_acknowledged_writes": 150,
+  "azure_replicated_writes": 150,
+  "lost_transactions": 0,
+  "empirical_results": {
+    "realized_rto_seconds": 0.778,
+    "target_rto_slo_seconds": 120.0,
+    "rto_slo_passed": true,
+    "realized_rpo_seconds": 0.0,
+    "target_rpo_slo_seconds": 10.0,
+    "rpo_slo_passed": true
+  }
+}
